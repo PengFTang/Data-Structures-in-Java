@@ -1,4 +1,4 @@
-# Data-Structures-in-Java
+# Data Structures in Java
 
 my own implementation of basic data structures in java.
 
