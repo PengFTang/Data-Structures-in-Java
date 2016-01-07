@@ -18,7 +18,7 @@ public class QuickSort {
         while(lo<=hi) {
             if(nums[lo]==nums[pivot]) ++lo; // move right if low item equals pivot item
             else if(nums[lo]<nums[pivot]) swap(nums, lo++, pivot++); // swap low item with pivot if low item is less than pivot item
-            else if(nums[hi] > nums[pivot]) --hi; // move left if high item is larger than pivot item
+            else if(nums[hi]>nums[pivot]) --hi; // move left if high item is larger than pivot item
             else swap(nums, lo, hi); // swap if low item > high item 
         }
         quickSort(nums, lo, right, rm); // sort left part
