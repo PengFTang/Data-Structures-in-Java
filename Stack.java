@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
  * @param <Type> generic type of the stack item
  */
 
-public class MyStack<Type> implements Iterable<Type> {
+public class Stack<Type> implements Iterable<Type> {
 	private int size;
 	private SListNode<Type> head;
 
@@ -24,7 +24,7 @@ public class MyStack<Type> implements Iterable<Type> {
 		}
 	}
 		
-	public MyStack() {
+	public Stack() {
 		head = null;
 		size = 0;
 	}
@@ -95,7 +95,7 @@ public class MyStack<Type> implements Iterable<Type> {
     
 	public static void main(String[] args) {
 		
-		MyStack<Character> stack = new MyStack<>();
+		Stack<Character> stack = new Stack<>();
 
 		System.out.println("stack size: " + stack.size() + "\n");
 		
