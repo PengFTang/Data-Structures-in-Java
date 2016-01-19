@@ -1,3 +1,8 @@
+package trie;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * implements a trie that stores strings/words consisted of ASCII characters
  * 
@@ -42,8 +47,7 @@ public class Trie {
         return search(word, 1);
     }
 
-    // Returns if there is any word in the trie
-    // that starts with the given prefix.
+    // Returns if there is any word in the trie that starts with the given prefix.
     public boolean containsPrefix(String prefix) {
         return search(prefix, 2);
     }
@@ -59,13 +63,32 @@ public class Trie {
         return type==1 ? current.isEnd : true;
     }
     
+    //list of words in the trie
+    public List<String> listWords() {
+    	List<String> list = new ArrayList<>();
+    	list(root, 0, "", list);
+    	return list;
+    }
+    private void list(TrieNode current, int id, String prefix, List<String> list) {
+    	if(current==null) return;
+    	for(int i=0; i<R; i++) {
+			TrieNode child = current.children[i];
+    		if(child!=null) {
+    			String res = prefix + (char)i;
+    			if(child.isEnd) list.add(res);
+    			list(child, i, res, list);
+    		}
+    	}
+    }
+    
+    // print trie contents
     public void print() {
         print("", root, 0, true, true);
     }
     // reference: http://stackoverflow.com/questions/4965335/how-to-print-binary-tree-diagram#answer-8948691
-    private void print(String prefix, TrieNode root, int id, boolean isEnd, boolean isRoot) {
+    private void print(String prefix, TrieNode root, int id, boolean isTail, boolean isRoot) {
     	if(!isRoot) System.out.println(prefix 
-    			+ (isEnd ? "└── " : "├── ") 
+    			+ (isTail ? "└── " : "├── ") 
     			+ (char)id 
     			+ (root.isEnd ? " ***" : ""));
     	
@@ -79,16 +102,17 @@ public class Trie {
 	            	lastChild = root.children[i];
 	            	lastChildId = i;
             	}
-            	else print(prefix + (isEnd ? "    " : "│   "), root.children[i], i, false, false);
+            	else print(prefix + (isRoot ? "" : (isTail ? "    " : "│   ")), root.children[i], i, false, false);
             }
         }
         if (lastChild!=null) {
-            print(prefix + (isEnd ?"    " : "│   "), lastChild, lastChildId, true, false);
+            print(prefix + (isRoot ? "" : (isTail ?"    " : "│   ")), lastChild, lastChildId, true, false);
         }
     }
 
     public static void main(String[] args) {
     	Trie trie = new Trie();
+    	trie.insert("abc");
     	trie.insert("bay");
     	trie.insert("bey");
     	trie.insert("bea");
@@ -109,6 +133,10 @@ public class Trie {
     	System.out.println("trie content (*** indicates the end of a word): ");
     	trie.print();
     	System.out.println();
+
+    	System.out.println("list of words in trie: ");
+    	System.out.println(trie.listWords());
+    	System.out.println();
     	
     	System.out.println("contains boy? " + trie.contains("boy"));
     	System.out.println("contains bo? " + trie.contains("bo"));
@@ -127,35 +155,41 @@ public class Trie {
     	/*
 		expected output:
 		trie content (*** indicates the end of a word): 
-		    ├── b
-		    │   ├── o
-		    │   │   └── y ***
-		    │   │       ├── d ***
-		    │   │       ├── c ***
-		    │   │       │   └── d ***
-		    │   │       └── e ***
-		    │   ├── e
-		    │   │   ├── e ***
-		    │   │   ├── d ***
-		    │   │   ├── a ***
-		    │   │   └── y ***
-		    │   ├── a
-		    │   │   └── y ***
-		    │   └── y
-		    │       ├── -
-		    │       │   └── b
-		    │       │       └── y ***
-		    │       └── e ***
-		    │           └── -
-		    │               └── b
-		    │                   └── y
-		    │                       └── e ***
-		    └── z
-		        ├── a
-		        │   └── d ***
-		        └── e
-		            ├── d ***
-		            └── f ***
+		├── b
+		│   ├── o
+		│   │   └── y ***
+		│   │       ├── d ***
+		│   │       ├── c ***
+		│   │       │   └── d ***
+		│   │       └── e ***
+		│   ├── e
+		│   │   ├── e ***
+		│   │   ├── d ***
+		│   │   ├── a ***
+		│   │   └── y ***
+		│   ├── a
+		│   │   └── y ***
+		│   └── y
+		│       ├── -
+		│       │   └── b
+		│       │       └── y ***
+		│       └── e ***
+		│           └── -
+		│               └── b
+		│                   └── y
+		│                       └── e ***
+		├── a
+		│   └── b
+		│       └── c ***
+		└── z
+		    ├── a
+		    │   └── d ***
+		    └── e
+		        ├── d ***
+		        └── f ***
+		
+		list of words in trie: 
+		[abc, bay, bea, bed, bee, bey, boy, boyc, boycd, boyd, boye, by-by, bye, bye-bye, zad, zed, zef]
 		
 		contains boy? true
 		contains bo? false
@@ -165,7 +199,7 @@ public class Trie {
 		
 		contains prefix bo? true
 		contains prefix b o? false
-		contains prefix bye? false
+		contains prefix bye? true
 		contains prefix ye? false
 		*/
     }
