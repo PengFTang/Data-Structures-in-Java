@@ -6,6 +6,13 @@ import java.util.List;
 /**
  * implements a trie that stores strings/words consisted of ASCII characters
  * 
+ * implemented methods include: 
+ *  - insert word into trie
+ *  - search for a word
+ *  - search for a prefix
+ *  - print trie content following trie format
+ *  - list all words in trie
+ * 
  * @author Peng F. Tang
  * pengftang@gmail.com
  */
