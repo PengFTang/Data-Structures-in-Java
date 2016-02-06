@@ -3,8 +3,7 @@ package tree;
 /**
  * implements a basic red black tree data structure
  * 
- * @author Peng F. Tang
- * pengftang@gmail.com
+ * @author FLAG
  * @param <Type> generic type of data stored in tree node
  */
 
