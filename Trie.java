@@ -13,8 +13,7 @@ import java.util.List;
  *  - print trie content following trie format
  *  - list all words in trie
  * 
- * @author Peng F. Tang
- * pengftang@gmail.com
+ * @author FLAG
  */
 
 public class Trie {
