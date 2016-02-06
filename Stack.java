@@ -5,8 +5,7 @@ import java.util.NoSuchElementException;
 /**
  * A LIFO stack of generic types
  * 
- * @author Peng F. Tang
- * pengftang@gmail.com
+ * @author FLAG
  * @param <Type> generic type of the stack item
  */
 
