@@ -1,37 +1,52 @@
 package hash;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 public class HashSet<T> {
 	
-	private static int CAPACITY = 16;
-	private static float LF = 0.75f;
-	private static int MAX_SIZE = (int)(LF*CAPACITY);
-	@SuppressWarnings("unchecked")
-	private List<T>[] arr = new LinkedList[CAPACITY];
+	private int CAPACITY;
+	private float LF;
+	private int MAX_SIZE;
+	private List<T>[] arr;
 	private int size = 0; 
-
+	
+	@SuppressWarnings("unchecked")
 	public HashSet() {
-		for(int i=0; i<CAPACITY; i++) {
-			arr[i] = new LinkedList<>();
-		}
-	}
-	public HashSet(int initialCapacity) {
-		CAPACITY = initialCapacity;
+		CAPACITY = 16;
+		LF = 0.75f;
 		MAX_SIZE = (int)(LF*CAPACITY);
+		arr = new List[CAPACITY];
 		for(int i=0; i<CAPACITY; i++) {
-			arr[i] = new LinkedList<>();
+			arr[i] = new List<>();
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	public HashSet(int initialCapacity) {
+		assert(initialCapacity > 0);
+		
+		CAPACITY = getNearestPowerTwo(initialCapacity);
+		MAX_SIZE = (int)(LF*CAPACITY);
+		
+		arr = new List[CAPACITY];
+		for(int i=0; i<CAPACITY; i++) {
+			arr[i] = new List<>();
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
 	public HashSet(int initialCapacity, int loadFactor) {
-		CAPACITY = initialCapacity;
+		assert(initialCapacity > 0);
+		assert(loadFactor > 0 && loadFactor <= 1);
+
+		CAPACITY = getNearestPowerTwo(initialCapacity);
 		LF = loadFactor;
 		MAX_SIZE = (int)(LF*CAPACITY);
+		
+		arr = new List[CAPACITY];
 		for(int i=0; i<CAPACITY; i++) {
-			arr[i] = new LinkedList<>();
+			arr[i] = new List<>();
 		}
 	}
 	
@@ -43,13 +58,13 @@ public class HashSet<T> {
 		return size==0;
 	}
 	
-	public void add(T item) {
-		if(contains(item)) return; // already existed
+	public boolean add(T item) {
+		if(contains(item)) return false; // already existed
 		if(size==MAX_SIZE) resize(); // resize
 		addItem(item); // add item into array
 		++size; // increase size
+		return true;
 	}
-	
 	private void addItem(T item) {
 		int index = hashing(item); // rehash
 		arr[index].add(item);
@@ -78,18 +93,73 @@ public class HashSet<T> {
 		}
 		return false;
 	}
-	
-	// needs to add iterator method
 
+	/*
+	// needs to implement the iterator method
+	public Iterator<T> iterator() {
+		return new HashSetIterator<T>();
+	}
+	private class HashSetIterator<T> implements Iterator<T> {
+		private List<T> current = null, next = null;
+		private T currentVal = null;
+		private int currentId = 0;
+		
+		public HashSetIterator() {
+			while(currentId < CAPACITY) {
+				if(!arr[currentId].isEmpty()) {
+					next = (List<T>) arr[currentId];
+					currentVal = current;
+					break;
+				}
+				++currentId;
+			}
+		}
+		
+		public boolean hasNext() {
+			return next != null;
+		}
+		
+		public T next() {
+			if(next==null) throw new NoSuchElementException();
+			
+			T item = next.get(0);
+			if(it.hasNext()) item = it.next();
+			else {
+				while(++currentId < N) {
+					if(!arr[currentId].isEmpty()) {
+						current = arr[currentId];
+						it = arr[currentId].iterator();
+					}
+				}
+			}
+			
+			Iterator<T> it = arr[currentId].iterator();
+			while(it.hasNext()) {
+				current = 
+			}
+			return item;
+		}
+	}
+	*/
+
+	private int getNearestPowerTwo(int capacity) {
+		int shifts = 0;
+		while(capacity > 0) {
+			capacity = capacity >> 1;
+			++shifts;
+		}
+		return 1 << ++shifts;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private boolean resize() {
 		int temp = CAPACITY;
 		CAPACITY = CAPACITY<<1;
 		MAX_SIZE = (int)(LF*CAPACITY);
 		List<T>[] arrCopy = arr;
-		arr = new LinkedList[CAPACITY];
+		arr = new List[CAPACITY];
 		for(int i=0; i<CAPACITY; i++) {
-			arr[i] = new LinkedList<>();
+			arr[i] = new List<>();
 		}
 		for(int i=0; i<temp; i++) {
 			Iterator<T> it = arrCopy[i].iterator();
@@ -115,6 +185,90 @@ public class HashSet<T> {
 		return sb.toString();
 	}
 	
+
+
+	private class List<T> {
+		public Node<T> head, tail;
+		public int size;
+		public List() {
+			head = tail = null;
+			size = 0;
+		}
+		
+		public boolean isEmpty() {
+			return size==0;
+		}
+		public void add(T val) {
+			if(head==null) {
+				head = tail = new Node<>(val);
+			}
+			else {
+				tail.next = new Node<>(val);
+				tail = tail.next;
+			}
+			++size;
+		}
+		public void remove(T val) {
+			Node<T> current = head, prev = new Node<>(val);
+			prev.next = current;
+			while(current != null) {
+				if(val.equals(current.val)) {
+					prev.next = current.next;
+					--size;
+					return;
+				}
+			}
+			throw new NoSuchElementException();
+		}
+		
+		public String toString() {
+			Node<T> current = head;
+			StringBuilder sb = new StringBuilder();
+			sb.append("[");
+			while(current!=null) {
+				sb.append(current.val + ",");
+				current = current.next;
+			}
+			if(sb.length()>1) sb.deleteCharAt(sb.length()-1);
+			sb.append("]");
+			return sb.toString();
+		}
+		
+		public Iterator<T> iterator() {
+			return new ListIterator<>();
+		}
+		private class ListIterator<T> implements Iterator<T> {
+			Node<T> next;
+			public ListIterator() {
+				next = (Node<T>) head;
+			}
+			public boolean hasNext() {
+				return next != null;
+			}
+			public T next() {
+				if(next==null) throw new NoSuchElementException();
+				T val = next.val;
+				next = next.next;
+				return val;
+			}
+			// incorrect and needs to be corrected!
+			public void remove() {
+				if(next==null) throw new NoSuchElementException();
+				T val = next.val;
+				next = next.next;
+			}
+		}
+		
+		private class Node<T> {
+			public T val;
+			public Node<T> next;
+			public Node(T val) {
+				this.val = val;
+				this.next = null;
+			}
+		}
+	}
+	
 	public static void main(String[] args) {
 
 		HashSet<String> list = new HashSet<>();
@@ -138,7 +292,7 @@ public class HashSet<T> {
 		System.out.println();
 		
 		System.out.println("add(jkl)");
-		list.add("a");
+		list.add("jkl");
 		
 		System.out.println("items: " + list);
 		System.out.println("size: " + list.size());
@@ -165,14 +319,16 @@ public class HashSet<T> {
 
 		System.out.println();
 		
-		System.out.println("remove(bcd): " + list.remove("bcd"));
+		System.out.println("remove(bcd): ");
+		list.remove("bcd");
 		System.out.println("items: " + list);
 		System.out.println("size: " + list.size());
 		
 		
 		System.out.println();
 		
-		System.out.println("remove(bcd): " + list.remove("bcd"));
+		System.out.println("remove(bcd): ");
+		list.remove("bcd");
 		System.out.println("items: " + list);
 		System.out.println("size: " + list.size());
 
@@ -193,10 +349,14 @@ public class HashSet<T> {
 
 		System.out.println();
 
-		System.out.println("remove(a): " + list.remove("a"));
-		System.out.println("remove(abcdefg): " + list.remove("abcdefg"));
-		System.out.println("remove(def): " + list.remove("def"));
-		System.out.println("remove(ghi): " + list.remove("ghi"));
+		System.out.println("remove(a): ");
+		list.remove("a");
+		System.out.println("remove(abcdefg): ");
+		list.remove("abcdefg");
+		System.out.println("remove(def): ");
+		list.remove("def");
+		System.out.println("remove(ghi): ");
+		list.remove("ghi");
 
 		System.out.println("items: " + list);
 		System.out.println("size: " + list.size());
